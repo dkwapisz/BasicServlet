@@ -1,6 +1,5 @@
 package com.pk.lab1.repository;
 
-import com.pk.lab1.model.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 
@@ -17,32 +16,32 @@ public class BaseRepository<T> {
         this.tableName = tableName;
     }
 
-    public List<Product> getAllEntities() {
+    public List<T> getAllEntities() {
         String stringQuery = String.format("SELECT entity FROM %s entity", tableName);
         Query query = entityManager.createQuery(stringQuery);
         return query.getResultList();
     }
 
-    public T getEntityById(Long productId) {
-        return entityManager.find(entityType, productId);
+    public T getEntityById(Long entityId) {
+        return entityManager.find(entityType, entityId);
     }
 
-    public void addEntity(T product) {
+    public void addEntity(T entity) {
         entityManager.getTransaction().begin();
-        entityManager.persist(product);
+        entityManager.persist(entity);
         entityManager.getTransaction().commit();
     }
 
-    public void updateEntity(T product) {
+    public void updateEntity(T entity) {
         entityManager.getTransaction().begin();
-        entityManager.merge(product);
+        entityManager.merge(entity);
         entityManager.getTransaction().commit();
     }
 
     public void deleteEntity(Long entityId) {
-        T product = getEntityById(entityId);
+        T entity = getEntityById(entityId);
         entityManager.getTransaction().begin();
-        entityManager.remove(product);
+        entityManager.remove(entity);
         entityManager.getTransaction().commit();
     }
 }

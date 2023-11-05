@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity(name = "products")
 @Data
 @NoArgsConstructor
@@ -18,8 +16,8 @@ public class Product {
     private int totalQuantity;
     private int blockedQuantity;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<OrderedProduct> order;
+    @ManyToOne
+    private Order order;
 
     public Product(String name, int productPrice, int totalQuantity) {
         this.name = name;

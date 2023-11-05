@@ -35,6 +35,7 @@
 <div id="buttons">
     <a href="order" class="button">Orders</a>
     <a href="product" class="button">Products</a>
+    <a href="h2/" class="button">H2 Database</a>
 </div>
 </body>
 </html>

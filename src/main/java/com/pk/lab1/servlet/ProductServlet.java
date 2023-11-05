@@ -1,10 +1,8 @@
 package com.pk.lab1.servlet;
 
+import com.pk.lab1.databaseUtils.EntityManagerSingleton;
 import com.pk.lab1.model.Product;
 import com.pk.lab1.repository.ProductRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,18 +16,11 @@ import java.util.List;
 public class ProductServlet extends HttpServlet {
 
     private ProductRepository productRepository;
-    EntityManagerFactory entityManagerFactory;
-    EntityManager entityManager;
-
-    public ProductServlet() {
-        this.entityManagerFactory = Persistence.createEntityManagerFactory("derby-unit");
-        this.entityManager = entityManagerFactory.createEntityManager();
-    }
 
     @Override
     public void init() throws ServletException {
         super.init();
-        productRepository = new ProductRepository(entityManager);
+        productRepository = new ProductRepository(EntityManagerSingleton.getEntityManager());
     }
 
     @Override
@@ -53,13 +44,5 @@ public class ProductServlet extends HttpServlet {
         htmlResponse.append("</ul></body></html>");
 
         response.getWriter().write(htmlResponse.toString());
-    }
-
-    @Override
-    public void destroy() {
-        if (entityManagerFactory != null) {
-            entityManagerFactory.close();
-        }
-        super.destroy();
     }
 }
