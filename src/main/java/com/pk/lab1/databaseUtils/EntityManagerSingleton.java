@@ -12,7 +12,7 @@ public class EntityManagerSingleton {
         if (factory == null) {
             synchronized (EntityManagerFactory.class) {
                 if (factory == null) {
-                    factory = Persistence.createEntityManagerFactory("derby-unit");
+                    factory = Persistence.createEntityManagerFactory("h2-unit");
                 }
             }
         }

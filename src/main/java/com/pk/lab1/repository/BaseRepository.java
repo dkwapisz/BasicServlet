@@ -27,21 +27,15 @@ public class BaseRepository<T> {
     }
 
     public void addEntity(T entity) {
-        entityManager.getTransaction().begin();
         entityManager.persist(entity);
-        entityManager.getTransaction().commit();
     }
 
     public void updateEntity(T entity) {
-        entityManager.getTransaction().begin();
         entityManager.merge(entity);
-        entityManager.getTransaction().commit();
     }
 
     public void deleteEntity(Long entityId) {
         T entity = getEntityById(entityId);
-        entityManager.getTransaction().begin();
         entityManager.remove(entity);
-        entityManager.getTransaction().commit();
     }
 }

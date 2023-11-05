@@ -24,37 +24,10 @@ public class OrderServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<Order> orders = orderRepository.getAllEntities();
-
-        response.setContentType("text/html");
-        response.setCharacterEncoding("UTF-8");
-
-        StringBuilder htmlResponse = new StringBuilder();
-        htmlResponse.append("<html><body><h1>Lista produktów:</h1><ul>");
-
-        for (Order order : orders) {
-            htmlResponse.append("<li>");
-            htmlResponse.append("Data zamówienia: ").append(order.getOrderDate()).append(", ");
-            htmlResponse.append("Dostawca: ").append(order.getSupplier()).append(", ");
-            htmlResponse.append("Email klienta: ").append(order.getCustomerEmail()).append(", ");
-            htmlResponse.append("Adres klienta: ").append(order.getCustomerAddress()).append(", ");
-            htmlResponse.append("Telefon klienta: ").append(order.getCustomerPhone()).append(", ");
-            htmlResponse.append("Dodatkowe informacje: ").append(order.getAdditionalInformation()).append(", ");
-            htmlResponse.append("Produkty: ").append(order.getOrderedProducts()).append(", ");
-            htmlResponse.append("</li>");
-        }
-
-        htmlResponse.append("</ul></body></html>");
-
-        response.getWriter().write(htmlResponse.toString());
+        System.out.println(orders);
+        request.setAttribute("orders", orders);
+        request.getRequestDispatcher("orderList.jsp").forward(request, response);
     }
-
-//    @Override
-//    public void destroy() {
-//        if (entityManagerFactory != null) {
-//            entityManagerFactory.close();
-//        }
-//        super.destroy();
-//    }
 }

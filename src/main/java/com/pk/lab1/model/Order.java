@@ -17,18 +17,20 @@ public class Order {
     private Long orderId;
 
     private Date orderDate;
+    private Date deliveryDate;
     private String supplier;
     private String customerEmail;
     private String customerAddress;
     private String customerPhone;
     private String additionalInformation;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Product> orderedProducts;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<OrderedProduct> orderedProducts;
 
-    public Order(Date orderDate, String supplier, String customerEmail, String customerAddress, String customerPhone,
-                 String additionalInformation, List<Product> orderedProducts) {
-        this.orderDate = orderDate;
+    public Order(Date deliveryDate, String supplier, String customerEmail, String customerAddress, String customerPhone,
+                 String additionalInformation, List<OrderedProduct> orderedProducts) {
+        this.orderDate = new Date();
+        this.deliveryDate = deliveryDate;
         this.supplier = supplier;
         this.customerEmail = customerEmail;
         this.customerAddress = customerAddress;

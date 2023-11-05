@@ -1,39 +1,49 @@
 package com.pk.lab1.databaseUtils;
 
+import com.pk.lab1.enums.OrderStatus;
 import com.pk.lab1.model.Order;
+import com.pk.lab1.model.OrderedProduct;
 import com.pk.lab1.model.Product;
-import com.pk.lab1.repository.OrderRepository;
-import com.pk.lab1.repository.ProductRepository;
+import com.pk.lab1.service.OrderService;
+import com.pk.lab1.service.ProductService;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @WebListener
 public class DataFillerListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-
         EntityManager entityManager = EntityManagerSingleton.getEntityManager();
-        OrderRepository orderRepository = new OrderRepository(entityManager);
-        ProductRepository productRepository = new ProductRepository(entityManager);
+        ProductService productService = new ProductService(entityManager);
+        OrderService orderService = new OrderService(entityManager);
 
-        Product product1 = new Product("Product 1", 10, 5);
-        Product product2 = new Product("Product 2", 15, 8);
-        Product product3 = new Product("Product 3", 20, 3);
+        Product product1 = new Product("Product 1", 10, 100);
+        Product product2 = new Product("Product 2", 15, 150);
+        Product product3 = new Product("Product 3", 20, 200);
+
+        productService.addProduct(product1);
+        productService.addProduct(product2);
+        productService.addProduct(product3);
+
+        OrderedProduct orderedProduct1 = new OrderedProduct(product1, 5);
+        OrderedProduct orderedProduct2 = new OrderedProduct(product2, 2);
+        OrderedProduct orderedProduct3 = new OrderedProduct(product3, 3);
+
+        List<OrderedProduct> orderedProducts = new ArrayList<>();
+        orderedProducts.add(orderedProduct1);
+        orderedProducts.add(orderedProduct2);
+        orderedProducts.add(orderedProduct3);
 
         Order order = new Order(new Date(), "Supplier 1", "customer@example.com",
-                "Address 123", "123-456-7890", "Additional Info", Collections.singletonList(product1));
+                "Address 123", "123-456-7890", "Additional Info", orderedProducts);
 
-        productRepository.addEntity(product1);
-        productRepository.addEntity(product2);
-        productRepository.addEntity(product3);
-
-        orderRepository.addEntity(order);
+        orderService.addOrder(order);
     }
-
 }

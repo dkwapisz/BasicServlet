@@ -13,16 +13,14 @@ public class Product {
     private Long productId;
     private String name;
     private int productPrice;
-    private int totalQuantity;
-    private int blockedQuantity;
+    private int availableQuantity;
 
     @ManyToOne
     private Order order;
 
-    public Product(String name, int productPrice, int totalQuantity) {
+    public Product(String name, int productPrice, int availableQuantity) {
         this.name = name;
         this.productPrice = productPrice;
-        this.totalQuantity = totalQuantity;
-        this.blockedQuantity = 0;
+        this.availableQuantity = availableQuantity;
     }
 }

@@ -24,25 +24,10 @@ public class ProductServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<Product> products = productRepository.getAllEntities();
-
-        response.setContentType("text/html");
-        response.setCharacterEncoding("UTF-8");
-
-        StringBuilder htmlResponse = new StringBuilder();
-        htmlResponse.append("<html><body><h1>Lista produktów:</h1><ul>");
-
-        for (Product product : products) {
-            htmlResponse.append("<li>")
-                    .append("Nazwa: ").append(product.getName()).append(", ")
-                    .append("Cena: ").append(product.getProductPrice()).append(", ")
-                    .append("Ilość: ").append(product.getTotalQuantity())
-                    .append("</li>");
-        }
-
-        htmlResponse.append("</ul></body></html>");
-
-        response.getWriter().write(htmlResponse.toString());
+        System.out.println(products);
+        request.setAttribute("products", products);
+        request.getRequestDispatcher("productList.jsp").forward(request, response);
     }
 }
