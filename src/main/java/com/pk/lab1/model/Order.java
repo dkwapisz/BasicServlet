@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
+
     private Date orderDate;
     private String supplier;
     private String customerEmail;
@@ -23,16 +25,16 @@ public class Order {
     private String additionalInformation;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Product> orderedProducts;
+    private List<OrderedProduct> orderedProducts;
 
     public Order(Date orderDate, String supplier, String customerEmail, String customerAddress, String customerPhone,
-                 String additionalInformation, List<Product> orderedProducts) {
+                 String additionalInformation) {
         this.orderDate = orderDate;
         this.supplier = supplier;
         this.customerEmail = customerEmail;
         this.customerAddress = customerAddress;
         this.customerPhone = customerPhone;
         this.additionalInformation = additionalInformation;
-        this.orderedProducts = orderedProducts;
+        this.orderedProducts = new ArrayList<>();
     }
 }

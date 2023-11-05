@@ -28,6 +28,6 @@
     </welcome-file-list>
 
     <listener>
-        <listener-class>com.pk.lab1.listener.DataFillerListener</listener-class>
+        <listener-class>com.pk.lab1.databaseUtils.DataFillerListener</listener-class>
     </listener>
 </web-app>

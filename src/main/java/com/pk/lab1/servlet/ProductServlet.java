@@ -34,7 +34,7 @@ public class ProductServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<Product> products = productRepository.getAllProducts();
+        List<Product> products = productRepository.getAllEntities();
 
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
@@ -45,8 +45,8 @@ public class ProductServlet extends HttpServlet {
         for (Product product : products) {
             htmlResponse.append("<li>")
                     .append("Nazwa: ").append(product.getName()).append(", ")
-                    .append("Cena: ").append(product.getPrice()).append(", ")
-                    .append("Ilość: ").append(product.getQuantity())
+                    .append("Cena: ").append(product.getProductPrice()).append(", ")
+                    .append("Ilość: ").append(product.getTotalQuantity())
                     .append("</li>");
         }
 

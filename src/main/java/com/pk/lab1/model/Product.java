@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity(name = "products")
 @Data
 @NoArgsConstructor
@@ -12,15 +14,17 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
     private String name;
-    private double price;
-    private int quantity;
+    private int productPrice;
+    private int totalQuantity;
+    private int blockedQuantity;
 
-    @ManyToOne
-    private Order order;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderedProduct> order;
 
-    public Product(String name, double price, int quantity) {
+    public Product(String name, int productPrice, int totalQuantity) {
         this.name = name;
-        this.price = price;
-        this.quantity = quantity;
+        this.productPrice = productPrice;
+        this.totalQuantity = totalQuantity;
+        this.blockedQuantity = 0;
     }
 }
