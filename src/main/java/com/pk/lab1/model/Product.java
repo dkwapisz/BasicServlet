@@ -23,4 +23,8 @@ public class Product {
         this.productPrice = productPrice;
         this.availableQuantity = availableQuantity;
     }
+
+    public Product(String name) {
+        this.name = name;
+    }
 }

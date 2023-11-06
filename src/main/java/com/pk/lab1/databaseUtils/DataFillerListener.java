@@ -1,6 +1,5 @@
 package com.pk.lab1.databaseUtils;
 
-import com.pk.lab1.enums.OrderStatus;
 import com.pk.lab1.model.Order;
 import com.pk.lab1.model.OrderedProduct;
 import com.pk.lab1.model.Product;
@@ -11,9 +10,7 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @WebListener
 public class DataFillerListener implements ServletContextListener {

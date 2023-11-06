@@ -5,25 +5,24 @@ import com.pk.lab1.model.Order;
 import com.pk.lab1.model.OrderedProduct;
 import com.pk.lab1.model.Product;
 import com.pk.lab1.repository.OrderRepository;
-import com.pk.lab1.repository.OrderedProductRepository;
 import com.pk.lab1.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
-    //private final OrderedProductRepository orderedProductRepository;
     private final EntityManager entityManager;
 
     public OrderService(EntityManager entityManager) {
         this.entityManager = entityManager;
         this.productRepository = new ProductRepository(entityManager);
         this.orderRepository = new OrderRepository(entityManager);
-        //this.orderedProductRepository = new OrderedProductRepository(entityManager);
     }
 
     public List<Order> getAllOrders() {
@@ -122,15 +121,36 @@ public class OrderService {
         return OrderStatus.DELETED;
     }
 
+    public List<OrderedProduct> createOrderedProductList(List<String> productNames, List<Integer> productQuantities) {
+        if (productNames.size() != productQuantities.size()) {
+            throw new RuntimeException("OrderedProducts cannot be created");
+        }
+
+        List<OrderedProduct> orderedProducts = new ArrayList<>();
+
+        IntStream.range(0, productNames.size()).forEach(i -> {
+            Product foundProduct = productRepository.findProductByName(productNames.get(i));
+            orderedProducts.add(new OrderedProduct(foundProduct, productQuantities.get(i)));
+        });
+
+        return orderedProducts;
+    }
+
     private Map<Long, Integer> getOrderedProductsWithQuantity(Order order) {
         return order.getOrderedProducts().stream()
+                .filter(orderedProduct -> orderedProduct.getProduct() != null)
                 .collect(Collectors.toMap(
-                        orderedProduct -> orderedProduct.getProduct().getProductId(),
+                        orderedProduct -> productRepository.findProductByName(orderedProduct.getProduct().getName())
+                                .getProductId(),
                         OrderedProduct::getQuantity
                 ));
     }
 
     private boolean isProductExistsAndAvailable(Map<Long, Integer> productIdToQuantityMap) {
+        if (productIdToQuantityMap.isEmpty()) {
+            return false;
+        }
+
         return productIdToQuantityMap.entrySet().stream()
                 .allMatch(entry -> {
                     Long productId = entry.getKey();
