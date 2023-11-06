@@ -143,7 +143,6 @@
     let productCounter = 1;
 
     function addOrder() {
-
         const deliveryDate = document.getElementById("deliveryDate").value;
         const supplier = document.getElementById("supplier").value;
         const customerEmail = document.getElementById("customerEmail").value;
@@ -181,8 +180,6 @@
             return;
         }
 
-        console.log(productNames)
-
         fetch("order", {
             method: "POST",
             headers: {
@@ -208,6 +205,60 @@
     }
 
     function modifyOrder(orderId) {
+        const endpointUrl = "order?orderId=" + orderId;
+
+        const deliveryDate = document.getElementById("deliveryDate").value;
+        const supplier = document.getElementById("supplier").value;
+        const customerEmail = document.getElementById("customerEmail").value;
+        const customerAddress = document.getElementById("customerAddress").value;
+        const customerPhone = document.getElementById("customerPhone").value;
+        const additionalInformation = document.getElementById("additionalInformation").value;
+
+        const productNames = [];
+        const productQuantities = [];
+
+        for (let i = 0; i < productCounter; i++) {
+            const productName = document.querySelector('input[name="productName' + i + '"]');
+            const productQuantity = document.querySelector('input[name="productQuantity' + i + '"]');
+
+            if (productName && productQuantity) {
+                productNames.push(productName.value);
+                productQuantities.push(productQuantity.value);
+            }
+        }
+
+        const orderData = {
+            deliveryDate: deliveryDate,
+            supplier: supplier,
+            customerEmail: customerEmail,
+            customerAddress: customerAddress,
+            customerPhone: customerPhone,
+            additionalInformation: additionalInformation,
+            productNames: productNames,
+            productQuantities: productQuantities
+        };
+
+        fetch(endpointUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderData)
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    alert("Order has been updated.");
+                    productCounter = 1;
+                    location.reload();
+                } else if (response.status === 406) {
+                    alert("Selected products are not available. Cannot update.");
+                } else {
+                    console.error("Cannot update order.");
+                }
+            })
+            .catch(error => {
+                console.error("Error occurred when making a PUT request: ", error);
+            });
 
         clearForm();
     }

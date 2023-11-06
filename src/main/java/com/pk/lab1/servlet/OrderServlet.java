@@ -25,6 +25,7 @@ import java.util.stream.IntStream;
 @WebServlet("/order")
 public class OrderServlet extends HttpServlet {
 
+    public static final String ORDER_ID = "orderId";
     private OrderService orderService;
 
     @Override
@@ -36,7 +37,6 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<Order> orders = orderService.getAllOrders();
-        System.out.println(orders);
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("orderList.jsp").forward(request, response);
     }
@@ -44,14 +44,7 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            StringBuilder stringBuilder = new StringBuilder();
-            BufferedReader reader = request.getReader();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-
-            String jsonData = stringBuilder.toString();
+            String jsonData = getJsonData(request);
 
             Order order = createOrderObject(jsonData);
 
@@ -66,18 +59,34 @@ public class OrderServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Cannot add order:  " + e.getMessage());
         }
-
     }
+
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String orderId = request.getParameter(ORDER_ID);
+            String jsonData = getJsonData(request);
 
+            Order order = createOrderObject(jsonData);
+
+            OrderStatus orderStatus = orderService.updateOrder(order, orderId);
+
+            if (orderStatus.equals(OrderStatus.UPDATED)) {
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else if (orderStatus.equals(OrderStatus.PRODUCTS_NOT_AVAILABLE)) {
+                response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("Cannot update order:  " + e.getMessage());
+        }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            String orderId = request.getParameter("orderId");
+            String orderId = request.getParameter(ORDER_ID);
             OrderStatus orderStatus = orderService.deleteOrder(Long.parseLong(orderId));
 
             if (orderStatus.equals(OrderStatus.DELETED)) {
@@ -90,6 +99,17 @@ public class OrderServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Cannot remove order:  " + e.getMessage());
         }
+    }
+
+    private String getJsonData(HttpServletRequest request) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+
+        return stringBuilder.toString();
     }
 
     // TODO need validation.

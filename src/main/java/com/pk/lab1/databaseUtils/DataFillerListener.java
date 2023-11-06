@@ -21,9 +21,9 @@ public class DataFillerListener implements ServletContextListener {
         ProductService productService = new ProductService(entityManager);
         OrderService orderService = new OrderService(entityManager);
 
-        Product product1 = new Product("Product 1", 10, 100);
-        Product product2 = new Product("Product 2", 15, 150);
-        Product product3 = new Product("Product 3", 20, 200);
+        Product product1 = new Product("Product1", 10, 1000);
+        Product product2 = new Product("Product2", 15, 1000);
+        Product product3 = new Product("Product3", 20, 1000);
 
         productService.addProduct(product1);
         productService.addProduct(product2);

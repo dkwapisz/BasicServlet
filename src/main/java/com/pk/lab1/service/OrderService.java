@@ -61,7 +61,7 @@ public class OrderService {
         }
     }
 
-    public OrderStatus updateOrder(Order order) {
+    public OrderStatus updateOrder(Order order, String orderIdString) {
         entityManager.getTransaction().begin();
 
         Map<Long, Integer> productIdToNewQuantityMap = getOrderedProductsWithQuantity(order);
@@ -69,6 +69,11 @@ public class OrderService {
         boolean productsExistAndAvailable = isProductExistsAndAvailable(productIdToNewQuantityMap);
 
         if (productsExistAndAvailable) {
+            Long orderId = Long.valueOf(orderIdString);
+            order.setOrderId(orderId);
+
+            Order oldOrder = new Order();
+            oldOrder.setOrderedProducts(new ArrayList<>(orderRepository.getEntityById(orderId).getOrderedProducts()));
             orderRepository.updateEntity(order);
 
             for (Map.Entry<Long, Integer> entry : productIdToNewQuantityMap.entrySet()) {
@@ -76,12 +81,16 @@ public class OrderService {
                 int newOrderedQuantity = entry.getValue();
 
                 Product product = productRepository.getEntityById(productId);
-                int oldOrderedQuantity = order.getOrderedProducts().stream()
+                int oldOrderedQuantity = oldOrder.getOrderedProducts().stream()
                         .filter(orderedProduct -> orderedProduct.getProduct().getProductId().equals(productId))
                         .mapToInt(OrderedProduct::getQuantity)
                         .sum();
 
-                int quantityChange = newOrderedQuantity - oldOrderedQuantity;
+                System.out.println("Available quantity = " + product.getAvailableQuantity());
+                System.out.println("New Ordered quantity = " + newOrderedQuantity);
+                System.out.println("Old Ordered quantity = " + oldOrderedQuantity);
+
+                int quantityChange = Math.abs(newOrderedQuantity - oldOrderedQuantity);
                 product.setAvailableQuantity(product.getAvailableQuantity() - quantityChange);
 
                 productRepository.updateEntity(product);
