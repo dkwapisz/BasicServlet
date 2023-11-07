@@ -15,21 +15,6 @@ public class ProductRepository extends BaseRepository<Product>{
         this.entityManager = entityManager;
     }
 
-    public Product findProductByNameAndPrice(String name, int price) {
-        String jpql = "SELECT p FROM products p WHERE p.name = :name AND p.productPrice = :price";
-        TypedQuery<Product> query = entityManager.createQuery(jpql, Product.class)
-                .setParameter("name", name)
-                .setParameter("price", price);
-
-        List<Product> results = query.getResultList();
-
-        if (results.isEmpty()) {
-            return null;
-        }
-
-        return results.get(0);
-    }
-
     public Product findProductByName(String name) {
         String jpql = "SELECT p FROM products p WHERE p.name = :name";
         TypedQuery<Product> query = entityManager.createQuery(jpql, Product.class)

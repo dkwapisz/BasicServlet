@@ -26,7 +26,13 @@ public class OrderService {
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.getAllEntities();
+        List<Order> orders = orderRepository.getAllEntities();
+
+        for (Order order : orders) {
+            entityManager.refresh(order);
+        }
+
+        return orders;
     }
 
     public Order getOrderById(Long orderId) {
@@ -85,10 +91,6 @@ public class OrderService {
                         .filter(orderedProduct -> orderedProduct.getProduct().getProductId().equals(productId))
                         .mapToInt(OrderedProduct::getQuantity)
                         .sum();
-
-                System.out.println("Available quantity = " + product.getAvailableQuantity());
-                System.out.println("New Ordered quantity = " + newOrderedQuantity);
-                System.out.println("Old Ordered quantity = " + oldOrderedQuantity);
 
                 int quantityChange = Math.abs(newOrderedQuantity - oldOrderedQuantity);
                 product.setAvailableQuantity(product.getAvailableQuantity() - quantityChange);

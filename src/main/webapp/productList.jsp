@@ -59,8 +59,8 @@
             <td><%= product.getName() %></td>
             <td><%= product.getProductPrice() %></td>
             <td><%= product.getAvailableQuantity() %></td>
-            <td><button type="button" onclick="modifyOrder(<%= product.getProductId() %>)">Modify</button></td>
-            <td><button type="button" onclick="deleteOrder(<%= product.getProductId() %>)">Delete</button></td>
+            <td><button type="button" onclick="modifyProduct(<%= product.getProductId() %>)">Modify</button></td>
+            <td><button type="button" onclick="deleteProduct(<%= product.getProductId() %>)">Delete</button></td>
         </tr>
         <%
                 }
@@ -73,7 +73,6 @@
     </form>
 
 <script>
-
     function addProduct() {
         const productName = document.getElementById("productName").value;
         const productPrice = document.getElementById("productPrice").value;
@@ -92,20 +91,21 @@
             },
             body: JSON.stringify(productData)
         })
-            .then(response => { // TODO
+            .then(response => {
                 if (response.status === 201) {
-                    alert("New order has been added.");
-                    productCounter = 1;
+                    alert("New product has been added.");
                     location.reload();
-                } else if (response.status === 406) {
-                    alert("Selected products are not available.");
+                } else if (response.status === 200) {
+                    alert("Product with given name already exists. Updated existing product.");
+                    location.reload();
                 } else {
-                    console.error("Cannot add a new order.");
+                    console.error("Cannot add a new product. Status: " + response.status);
                 }
             })
             .catch(error => {
                 console.error("Error occurred when making a POST request: ", error);
             });
+
         clearForm();
     }
 
@@ -129,15 +129,17 @@
             },
             body: JSON.stringify(productData)
         })
-            .then(response => { // TODO
-                if (response.status === 200) {
-                    alert("Order has been updated.");
-                    productCounter = 1;
+            .then(response => {
+                if (response.status === 201) {
+                    alert("Product has been updated.");
                     location.reload();
-                } else if (response.status === 406) {
-                    alert("Selected products are not available. Cannot update.");
+                } else if (response.status === 200) {
+                    alert("Product with given name already exists. Updated existing product.");
+                    location.reload();
+                } else if (response.status === 404) {
+                    alert("Product with given ID does not exist.");
                 } else {
-                    console.error("Cannot update order.");
+                    console.error("Cannot update product. Status: " + response.status);
                 }
             })
             .catch(error => {
@@ -157,18 +159,23 @@
             },
         })
             .then(response => {
-                if (response.status === 204) { // TODO
-                    alert("Order " + productId + " has been removed.")
+                if (response.status === 204) {
+                    alert("Product " + productId + " has been removed.")
                     location.reload();
                 } else if (response.status === 404) {
                     alert("Not found product to delete.")
+                } else if (response.status === 403) {
+                    alert("Product cannot be removed because it exists on the order. " +
+                        "Set available quantity to 0 instead.")
                 } else {
-                    console.error("Cannot remove order.");
+                    console.error("Cannot remove product. Status: " + response.status);
                 }
             })
             .catch(error => {
                 console.error("Error occurred when making a DELETE request: ", error);
             });
+
+        clearForm();
     }
 
     function clearForm() {

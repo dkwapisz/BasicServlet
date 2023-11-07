@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @WebServlet("/order")
 public class OrderServlet extends HttpServlet {
@@ -54,6 +53,8 @@ public class OrderServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_CREATED);
             } else if (orderStatus.equals(OrderStatus.PRODUCTS_NOT_AVAILABLE)) {
                 response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -76,6 +77,8 @@ public class OrderServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_OK);
             } else if (orderStatus.equals(OrderStatus.PRODUCTS_NOT_AVAILABLE)) {
                 response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -93,8 +96,9 @@ public class OrderServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } else if (orderStatus.equals(OrderStatus.NOT_FOUND)) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
-
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Cannot remove order:  " + e.getMessage());

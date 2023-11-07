@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "orderedProduct")
+@Entity(name = "orderedProducts")
 @Data
 @NoArgsConstructor
 public class OrderedProduct {

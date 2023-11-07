@@ -190,7 +190,7 @@
                 } else if (response.status === 406) {
                     alert("Selected products are not available.");
                 } else {
-                    console.error("Cannot add a new order.");
+                    console.error("Cannot add a new order. Status: " + response.status);
                 }
             })
             .catch(error => {
@@ -248,7 +248,7 @@
                 } else if (response.status === 406) {
                     alert("Selected products are not available. Cannot update.");
                 } else {
-                    console.error("Cannot update order.");
+                    console.error("Cannot update order. Status: " + response.status);
                 }
             })
             .catch(error => {
@@ -274,12 +274,14 @@
                 } else if (response.status === 404) {
                     alert("Not found product to delete.")
                 } else {
-                    console.error("Cannot remove order.");
+                    console.error("Cannot remove order. Status: " + response.status);
                 }
             })
             .catch(error => {
                 console.error("Error occurred when making a DELETE request: ", error);
             });
+
+        clearForm();
     }
 
     function addProductRow() {
