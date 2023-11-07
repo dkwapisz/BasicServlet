@@ -11,9 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+
+import static com.pk.lab1.utils.Utils.getJsonData;
 
 @WebServlet("/product")
 public class ProductServlet extends HttpServlet {
@@ -39,7 +40,6 @@ public class ProductServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             String jsonData = getJsonData(request);
-
             Product product = createProductObject(jsonData);
 
             ProductStatus productStatus = productService.addProduct(product);
@@ -104,18 +104,6 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-    private String getJsonData(HttpServletRequest request) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            stringBuilder.append(line);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    // TODO need validation.
     private Product createProductObject(String jsonData) {
         JSONObject jsonObject = new JSONObject(jsonData);
 

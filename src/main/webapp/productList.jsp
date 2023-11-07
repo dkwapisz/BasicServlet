@@ -6,35 +6,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Products</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
 <h1>Product Management</h1>
 <form action="index.jsp" method="get">
-    <input type="submit" value="Return to Home">
+    <button type="submit">Return to Home</button>
 </form>
 
 <h2>Add New Product</h2>
 <form>
-    <input type="reset" value="Clear Form" onclick="clearForm()">
+    <button type="reset" onclick="clearForm()">Clear Form</button>
     <br><br>
 
     <label for="productName">Product Name:</label>
     <input type="text" id="productName" name="productName" required><br><br>
 
     <label for="productPrice">Product Price:</label>
-    <input type="text" id="productPrice" name="productPrice" required><br><br>
+    <input type="number" id="productPrice" name="productPrice" required><br><br>
 
     <label for="availableQuantity">Available Quantity:</label>
     <input type="number" id="availableQuantity" name="availableQuantity" required><br><br>
@@ -67,10 +56,7 @@
             }
         %>
     </table>
-
-    <form action="product" method="post">
-        <input type="button" value="Add Product" onclick="addProduct()">
-    </form>
+    <button type="submit" onclick="addProduct()">Add Product</button>
 
 <script>
     function addProduct() {
@@ -98,7 +84,9 @@
                 } else if (response.status === 200) {
                     alert("Product with given name already exists. Updated existing product.");
                     location.reload();
-                } else {
+                } else if (response.status === 400) {
+                    alert("Incorrect data. Please check form.")
+                }  else {
                     console.error("Cannot add a new product. Status: " + response.status);
                 }
             })
@@ -136,6 +124,8 @@
                 } else if (response.status === 200) {
                     alert("Product with given name already exists. Updated existing product.");
                     location.reload();
+                } else if (response.status === 400) {
+                    alert("Incorrect data. Please check form.")
                 } else if (response.status === 404) {
                     alert("Product with given ID does not exist.");
                 } else {

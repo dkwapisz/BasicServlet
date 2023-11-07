@@ -7,28 +7,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Orders</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
 <h1>Order Management</h1>
 <form action="index.jsp" method="get">
-    <input type="submit" value="Return to Home">
+    <button type="submit">Return to Home</button>
 </form>
 
 <h2>Add New Order</h2>
 <form>
-    <input type="reset" value="Clear Form" onclick="clearForm()">
+    <button type="reset" onclick="clearForm()">Clear Form</button>
     <br><br>
 
     <label for="deliveryDate">Delivery Date:</label>
@@ -125,6 +114,7 @@
         <td><%= totalPrice %></td>
         <td>
             <button type="button" onclick="modifyOrder(<%= order.getOrderId() %>)">Modify</button>
+            <h1></h1>
             <button type="button" onclick="deleteOrder(<%= order.getOrderId() %>)">Delete</button>
         </td>
     </tr>
@@ -187,6 +177,8 @@
                     alert("New order has been added.");
                     productCounter = 1;
                     location.reload();
+                } else if (response.status === 400) {
+                    alert("Incorrect input data.");
                 } else if (response.status === 406) {
                     alert("Selected products are not available.");
                 } else {
@@ -245,6 +237,8 @@
                     alert("Order has been updated.");
                     productCounter = 1;
                     location.reload();
+                } else if (response.status === 400) {
+                    alert("Incorrect input data.");
                 } else if (response.status === 406) {
                     alert("Selected products are not available. Cannot update.");
                 } else {

@@ -13,13 +13,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.pk.lab1.utils.Utils.getJsonData;
+import static com.pk.lab1.utils.Utils.parseDate;
 
 @WebServlet("/order")
 public class OrderServlet extends HttpServlet {
@@ -105,18 +106,6 @@ public class OrderServlet extends HttpServlet {
         }
     }
 
-    private String getJsonData(HttpServletRequest request) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            stringBuilder.append(line);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    // TODO need validation.
     private Order createOrderObject(String jsonData) throws ParseException {
         JSONObject jsonObject = new JSONObject(jsonData);
 
@@ -142,10 +131,5 @@ public class OrderServlet extends HttpServlet {
 
         return new Order(deliveryDate, supplier, customerEmail, customerAddress, customerPhone, additionalInformation,
                 orderedProducts);
-    }
-
-    private Date parseDate(String dateString) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.parse(dateString);
     }
 }
