@@ -28,7 +28,7 @@
 
 <h2>Add New Order</h2>
 <form>
-    <input type="reset" value="Clear Form">
+    <input type="reset" value="Clear Form" onclick="clearForm()">
     <br><br>
 
     <label for="deliveryDate">Delivery Date:</label>
@@ -80,6 +80,7 @@
         <th>Customer Phone</th>
         <th>Additional Information</th>
         <th>Ordered Products</th>
+        <th>Total Order Price</th>
         <th>Action</th>
     </tr>
     <%
@@ -88,46 +89,40 @@
             for (Order order : orders) {
     %>
     <tr>
-        <td><%= order.getOrderId() %>
-        </td>
-        <td><%= order.getOrderDate() %>
-        </td>
-        <td><%= order.getDeliveryDate() %>
-        </td>
-        <td><%= order.getSupplier() %>
-        </td>
-        <td><%= order.getCustomerEmail() %>
-        </td>
-        <td><%= order.getCustomerAddress() %>
-        </td>
-        <td><%= order.getCustomerPhone() %>
-        </td>
-        <td><%= order.getAdditionalInformation() %>
-        </td>
+        <td><%= order.getOrderId() %></td>
+        <td><%= order.getOrderDate() %></td>
+        <td><%= order.getDeliveryDate() %></td>
+        <td><%= order.getSupplier() %></td>
+        <td><%= order.getCustomerEmail() %></td>
+        <td><%= order.getCustomerAddress() %></td>
+        <td><%= order.getCustomerPhone() %></td>
+        <td><%= order.getAdditionalInformation() %></td>
         <td>
             <table>
                 <tr>
                     <th>Product Name</th>
                     <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Single Product Price</th>
+                    <th>Total Product Price</th>
                 </tr>
                 <%
+                    int totalPrice = 0;
                     List<OrderedProduct> orderedProducts = order.getOrderedProducts();
                     for (OrderedProduct product : orderedProducts) {
+                        totalPrice += product.getProduct().getProductPrice() * product.getQuantity();
                 %>
                 <tr>
-                    <td><%= product.getProduct().getName() %>
-                    </td>
-                    <td><%= product.getQuantity() %>
-                    </td>
-                    <td><%= product.getProduct().getProductPrice() %>
-                    </td>
+                    <td><%= product.getProduct().getName() %></td>
+                    <td><%= product.getQuantity() %></td>
+                    <td><%= product.getProduct().getProductPrice() %></td>
+                    <td><%= product.getProduct().getProductPrice() * product.getQuantity() %></td>
                 </tr>
                 <%
                     }
                 %>
             </table>
         </td>
+        <td><%= totalPrice %></td>
         <td>
             <button type="button" onclick="modifyOrder(<%= order.getOrderId() %>)">Modify</button>
             <button type="button" onclick="deleteOrder(<%= order.getOrderId() %>)">Delete</button>

@@ -30,4 +30,19 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("products", products);
         request.getRequestDispatcher("productList.jsp").forward(request, response);
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // TODO + Make sure there are no Product name duplicates.
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // TODO + Make sure there are no Product name duplicates.
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // TODO
+    }
 }
