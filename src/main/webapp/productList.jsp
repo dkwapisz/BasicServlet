@@ -99,16 +99,17 @@
 
     function modifyProduct(productId) {
         const endpointUrl = "product?productId=" + productId;
+        const productData = {};
 
-        const productName = document.getElementById("productName").value;
-        const productPrice = document.getElementById("productPrice").value;
-        const availableQuantity = document.getElementById("availableQuantity").value;
-
-        const productData = {
-            productName: productName,
-            productPrice: productPrice,
-            availableQuantity: availableQuantity
+        const addFieldIfNotEmpty = (field, value) => {
+            if (value !== "") {
+                productData[field] = value;
+            }
         };
+
+        addFieldIfNotEmpty("productName", document.getElementById("productName").value);
+        addFieldIfNotEmpty("productPrice", document.getElementById("productPrice").value);
+        addFieldIfNotEmpty("availableQuantity", document.getElementById("availableQuantity").value);
 
         fetch(endpointUrl, {
             method: "PUT",
@@ -122,7 +123,7 @@
                     alert("Product has been updated.");
                     location.reload();
                 } else if (response.status === 200) {
-                    alert("Product with given name already exists. Updated existing product.");
+                    alert("Existing product has been updated.");
                     location.reload();
                 } else if (response.status === 400) {
                     alert("Incorrect data. Please check form.")

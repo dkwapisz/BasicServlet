@@ -205,13 +205,20 @@
 
     function modifyOrder(orderId) {
         const endpointUrl = "order?orderId=" + orderId;
+        const orderData = {};
 
-        const deliveryDate = document.getElementById("deliveryDate").value;
-        const supplier = document.getElementById("supplier").value;
-        const customerEmail = document.getElementById("customerEmail").value;
-        const customerAddress = document.getElementById("customerAddress").value;
-        const customerPhone = document.getElementById("customerPhone").value;
-        const additionalInformation = document.getElementById("additionalInformation").value;
+        const addFieldIfNotEmpty = (field, value) => {
+            if (value !== "") {
+                orderData[field] = value;
+            }
+        };
+
+        addFieldIfNotEmpty("deliveryDate", document.getElementById("deliveryDate").value);
+        addFieldIfNotEmpty("supplier", document.getElementById("supplier").value);
+        addFieldIfNotEmpty("customerEmail", document.getElementById("customerEmail").value);
+        addFieldIfNotEmpty("customerAddress", document.getElementById("customerAddress").value);
+        addFieldIfNotEmpty("customerPhone", document.getElementById("customerPhone").value);
+        addFieldIfNotEmpty("additionalInformation", document.getElementById("additionalInformation").value);
 
         const productNames = [];
         const productQuantities = [];
@@ -226,16 +233,13 @@
             }
         }
 
-        const orderData = {
-            deliveryDate: deliveryDate,
-            supplier: supplier,
-            customerEmail: customerEmail,
-            customerAddress: customerAddress,
-            customerPhone: customerPhone,
-            additionalInformation: additionalInformation,
-            productNames: productNames,
-            productQuantities: productQuantities
-        };
+        if (productNames.length > 0 && productNames[0] !== "") {
+            orderData.productNames = productNames;
+        }
+
+        if (productQuantities.length > 0 && productQuantities[0] !== "") {
+            orderData.productQuantities = productQuantities;
+        }
 
         fetch(endpointUrl, {
             method: "PUT",
@@ -263,6 +267,7 @@
 
         clearForm();
     }
+
 
     function deleteOrder(orderId) {
         const endpointUrl = "order?orderId=" + orderId;
