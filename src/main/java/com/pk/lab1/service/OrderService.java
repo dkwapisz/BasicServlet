@@ -14,14 +14,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.pk.lab1.utils.Utils.parseDate;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class OrderService {
@@ -197,6 +195,8 @@ public class OrderService {
                 productQuantities.add(Integer.parseInt(productQuantitiesArray.getString(i)));
             }
             newOrder.setOrderedProducts(createOrderedProductList(productNames, productQuantities));
+        } else {
+            newOrder.setOrderedProducts(order.getOrderedProducts());
         }
 
         newOrder.setDeliveryDate(deliveryDate);
@@ -213,10 +213,14 @@ public class OrderService {
     }
 
     private int getOldOrderedQuantity(Order oldOrder, Long productId) {
-        return oldOrder.getOrderedProducts().stream()
-                .filter(orderedProduct -> orderedProduct.getProduct().getProductId().equals(productId))
-                .mapToInt(OrderedProduct::getQuantity)
-                .sum();
+        if (isNull(oldOrder.getOrderedProducts())) {
+            return 0;
+        } else {
+            return oldOrder.getOrderedProducts().stream()
+                    .filter(orderedProduct -> orderedProduct.getProduct().getProductId().equals(productId))
+                    .mapToInt(OrderedProduct::getQuantity)
+                    .sum();
+        }
     }
 
     private void updateRemovedFromOrderProductQuantities(Order oldOrder, Map<Long, Integer> productIdToNewQuantityMap,
@@ -248,6 +252,9 @@ public class OrderService {
     }
 
     private Map<Long, Integer> getOrderedProductsWithQuantity(Order order) {
+        if (isNull(order.getOrderedProducts())) {
+            return Collections.emptyMap();
+        }
         return order.getOrderedProducts().stream()
                 .filter(orderedProduct -> orderedProduct.getProduct() != null)
                 .collect(Collectors.toMap(
@@ -275,7 +282,7 @@ public class OrderService {
     private boolean isNotUpdatingQuantity(Order order, String orderId) {
         Order oldOrder = getOrderById(Long.valueOf(orderId));
 
-        return oldOrder.getOrderedProducts().equals(order.getOrderedProducts());
+        return isNull(order.getOrderedProducts()) || oldOrder.getOrderedProducts().equals(order.getOrderedProducts());
     }
 
     private void setDeliveryStrategy(Order order) {

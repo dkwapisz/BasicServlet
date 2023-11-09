@@ -297,7 +297,8 @@
 
     function changeDeliveryStatus(orderId) {
         const deliveryOptions = ["ORDER_CREATED", "ORDER_READY_TO_SEND", "ORDER_SENT", "ORDER_DELIVERED"];
-        const selectedNewDelivery = prompt("Wybierz nowy status dostawy:\n0 - ORDER_CREATED\n1 - ORDER_READY_TO_SEND\n2 - ORDER_SENT\n3 - ORDER_DELIVERED");
+        const selectedNewDelivery = prompt("Choose new delivery status:\n0 - ORDER_CREATED\n1 - " +
+            "ORDER_READY_TO_SEND\n2 - ORDER_SENT\n3 - ORDER_DELIVERED");
 
         if (selectedNewDelivery !== null && selectedNewDelivery >= 0 && selectedNewDelivery < deliveryOptions.length) {
             const endpointUrl = "order/status?orderId=" + orderId;
