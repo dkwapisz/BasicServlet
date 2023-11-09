@@ -6,7 +6,7 @@ import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
-public class ProductRepository extends BaseRepository<Product>{
+public class ProductRepository extends BaseRepository<Product> {
 
     private final EntityManager entityManager;
 

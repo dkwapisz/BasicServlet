@@ -121,12 +121,16 @@ public class ProductService {
     public Product updateProductObject(String jsonData, String productId) {
         JSONObject jsonObject = new JSONObject(jsonData);
 
-        Product oldProduct = getProductById(Long.parseLong(productId));
+        Product product = getProductById(Long.parseLong(productId));
 
-        String productName = jsonObject.has("productName") ? jsonObject.getString("productName") : oldProduct.getName();
-        int productPrice = jsonObject.has("productPrice") ? Integer.parseInt(jsonObject.getString("productPrice")) : oldProduct.getProductPrice();
-        int availableQuantity = jsonObject.has("availableQuantity") ? Integer.parseInt(jsonObject.getString("availableQuantity")) : oldProduct.getAvailableQuantity();
+        String productName = jsonObject.has("productName") ? jsonObject.getString("productName") : product.getName();
+        int productPrice = jsonObject.has("productPrice") ? Integer.parseInt(jsonObject.getString("productPrice")) : product.getProductPrice();
+        int availableQuantity = jsonObject.has("availableQuantity") ? Integer.parseInt(jsonObject.getString("availableQuantity")) : product.getAvailableQuantity();
 
-        return new Product(productName, productPrice, availableQuantity);
+        product.setName(productName);
+        product.setProductPrice(productPrice);
+        product.setAvailableQuantity(availableQuantity);
+
+        return product;
     }
 }

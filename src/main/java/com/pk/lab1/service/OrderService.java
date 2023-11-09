@@ -84,8 +84,9 @@ public class OrderService {
         Map<Long, Integer> productIdToNewQuantityMap = getOrderedProductsWithQuantity(order);
 
         boolean productsExistAndAvailable = isProductExistsAndAvailable(productIdToNewQuantityMap);
+        boolean notUpdatingQuantity = isNotUpdatingQuantity(order, orderIdString);
 
-        if (productsExistAndAvailable) {
+        if (productsExistAndAvailable || notUpdatingQuantity) {
             Long orderId = Long.valueOf(orderIdString);
             order.setOrderId(orderId);
 
@@ -174,20 +175,18 @@ public class OrderService {
     public Order updateOrder(String jsonData, String orderId) throws ParseException {
         JSONObject jsonObject = new JSONObject(jsonData);
 
-        Order oldOrder = getOrderById(Long.parseLong(orderId));
+        Order order = getOrderById(Long.parseLong(orderId));
 
-        Date deliveryDate = jsonObject.has("deliveryDate") ? parseDate(jsonObject.getString("deliveryDate")) : oldOrder.getDeliveryDate();
-        SupplierType supplier = jsonObject.has("supplier") ? SupplierType.valueOf(jsonObject.getString("supplier")) : oldOrder.getSupplier();
-        String customerEmail = jsonObject.has("customerEmail") ? jsonObject.getString("customerEmail") : oldOrder.getCustomerEmail();
-        String customerAddress = jsonObject.has("customerAddress") ? jsonObject.getString("customerAddress") : oldOrder.getCustomerAddress();
-        String customerPhone = jsonObject.has("customerPhone") ? jsonObject.getString("customerPhone") : oldOrder.getCustomerPhone();
-        String additionalInformation = jsonObject.has("additionalInformation") ? jsonObject.getString("additionalInformation") : oldOrder.getAdditionalInformation();
-        DeliveryStatus deliveryStatus = jsonObject.has("deliveryStatus") ? DeliveryStatus.valueOf(jsonObject.getString("deliveryStatus")) : oldOrder.getDeliveryStatus();
+        Date deliveryDate = jsonObject.has("deliveryDate") ? parseDate(jsonObject.getString("deliveryDate")) : order.getDeliveryDate();
+        SupplierType supplier = jsonObject.has("supplier") ? SupplierType.valueOf(jsonObject.getString("supplier")) : order.getSupplier();
+        String customerEmail = jsonObject.has("customerEmail") ? jsonObject.getString("customerEmail") : order.getCustomerEmail();
+        String customerAddress = jsonObject.has("customerAddress") ? jsonObject.getString("customerAddress") : order.getCustomerAddress();
+        String customerPhone = jsonObject.has("customerPhone") ? jsonObject.getString("customerPhone") : order.getCustomerPhone();
+        String additionalInformation = jsonObject.has("additionalInformation") ? jsonObject.getString("additionalInformation") : order.getAdditionalInformation();
+        DeliveryStatus deliveryStatus = jsonObject.has("deliveryStatus") ? DeliveryStatus.valueOf(jsonObject.getString("deliveryStatus")) : order.getDeliveryStatus();
 
         JSONArray productNamesArray = jsonObject.has("productNames") ? jsonObject.getJSONArray("productNames") : null;
         JSONArray productQuantitiesArray = jsonObject.has("productQuantities") ? jsonObject.getJSONArray("productQuantities") : null;
-
-        List<OrderedProduct> orderedProducts;
 
         if (nonNull(productNamesArray) && nonNull(productQuantitiesArray)) {
             List<String> productNames = new ArrayList<>();
@@ -197,17 +196,20 @@ public class OrderService {
                 productNames.add(productNamesArray.getString(i));
                 productQuantities.add(Integer.parseInt(productQuantitiesArray.getString(i)));
             }
-            orderedProducts = createOrderedProductList(productNames, productQuantities);
-        } else {
-            orderedProducts = oldOrder.getOrderedProducts();
+            order.setOrderedProducts(createOrderedProductList(productNames, productQuantities));
         }
 
-        Order newOrder = new Order(deliveryDate, supplier, customerEmail, customerAddress, customerPhone, additionalInformation,
-                orderedProducts, deliveryStatus);
+        order.setDeliveryDate(deliveryDate);
+        order.setSupplier(supplier);
+        order.setCustomerEmail(customerEmail);
+        order.setCustomerAddress(customerAddress);
+        order.setCustomerPhone(customerPhone);
+        order.setAdditionalInformation(additionalInformation);
+        order.setDeliveryStatus(deliveryStatus);
 
-        setDeliveryStrategy(newOrder);
+        setDeliveryStrategy(order);
 
-        return newOrder;
+        return order;
     }
 
     private List<OrderedProduct> createOrderedProductList(List<String> productNames, List<Integer> productQuantities) {
@@ -248,6 +250,12 @@ public class OrderService {
 
                     return product != null && orderedQuantity <= product.getAvailableQuantity();
                 });
+    }
+
+    private boolean isNotUpdatingQuantity(Order order, String orderId) {
+        Order oldOrder = getOrderById(Long.valueOf(orderId));
+
+        return oldOrder.getOrderedProducts().equals(order.getOrderedProducts());
     }
 
     private void setDeliveryStrategy(Order order) {
