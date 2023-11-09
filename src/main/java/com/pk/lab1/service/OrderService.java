@@ -92,14 +92,14 @@ public class OrderService {
             order.setOrderId(orderId);
             setDeliveryStrategy(order);
 
+            updateRemovedFromOrderProductQuantities(oldOrder, productIdToNewQuantityMap);
+
             for (Map.Entry<Long, Integer> entry : productIdToNewQuantityMap.entrySet()) {
                 Long productId = entry.getKey();
                 int newOrderedQuantity = entry.getValue();
 
                 Product product = productRepository.getEntityById(productId);
                 int oldOrderedQuantity = getOldOrderedQuantity(oldOrder, productId);
-
-                updateRemovedFromOrderProductQuantities(oldOrder, productIdToNewQuantityMap, productId, product);
 
                 int quantityChange = Math.abs(newOrderedQuantity - oldOrderedQuantity);
                 product.setAvailableQuantity(product.getAvailableQuantity() - quantityChange);
@@ -223,15 +223,13 @@ public class OrderService {
         }
     }
 
-    private void updateRemovedFromOrderProductQuantities(Order oldOrder, Map<Long, Integer> productIdToNewQuantityMap,
-                                                         Long productId, Product product) {
+    private void updateRemovedFromOrderProductQuantities(Order oldOrder, Map<Long, Integer> productIdToNewQuantityMap) {
         if (oldOrder.getOrderedProducts().size() != productIdToNewQuantityMap.size()) {
             oldOrder.getOrderedProducts().stream()
-                    .filter(orderedProduct -> !orderedProduct.getProduct().getProductId().equals(productId))
+                    .filter(orderedProduct -> !productIdToNewQuantityMap.containsKey(orderedProduct.getProduct().getProductId()))
                     .forEach(orderedProduct -> {
                         orderedProduct.getProduct().setAvailableQuantity(orderedProduct.getProduct()
                                 .getAvailableQuantity() + orderedProduct.getQuantity());
-                        productRepository.updateEntity(product);
                     });
         }
     }

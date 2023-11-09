@@ -1,26 +1,28 @@
 package com.pk.lab1.service;
 
 import com.pk.lab1.enums.ProductStatus;
+import com.pk.lab1.model.Order;
 import com.pk.lab1.model.Product;
-import com.pk.lab1.repository.OrderedProductRepository;
+import com.pk.lab1.repository.OrderRepository;
 import com.pk.lab1.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class ProductService {
     private final ProductRepository productRepository;
-    private final OrderedProductRepository orderedProductRepository;
+    private final OrderRepository orderRepository;
     private final EntityManager entityManager;
 
     public ProductService(EntityManager entityManager) {
         this.entityManager = entityManager;
         this.productRepository = new ProductRepository(entityManager);
-        this.orderedProductRepository = new OrderedProductRepository(entityManager);
+        this.orderRepository = new OrderRepository(entityManager);
     }
 
     public List<Product> getAllProducts() {
@@ -105,7 +107,11 @@ public class ProductService {
     }
 
     public boolean isProductExistOnOrderList(Long productId) {
-        return orderedProductRepository.doesProductExistInOrderList(productId);
+        List<Order> orderList = orderRepository.getAllEntities();
+
+        return orderList.stream()
+                .flatMap(order -> order.getOrderedProducts().stream())
+                .anyMatch(orderedProduct -> Objects.equals(orderedProduct.getProduct().getProductId(), productId));
     }
 
     public Product createProductObject(String jsonData) {
