@@ -64,7 +64,7 @@ public class OrderServlet extends HttpServlet {
             String orderId = request.getParameter(ORDER_ID);
             String jsonData = getJsonData(request);
 
-            Order order = orderService.updateOrder(jsonData, orderId);
+            Order order = orderService.createUpdateOrder(jsonData, orderId);
 
             OrderStatus orderStatus = orderService.updateOrder(order, orderId);
             performDeliveryIfDone(order);

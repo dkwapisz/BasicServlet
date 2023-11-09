@@ -88,22 +88,20 @@ public class OrderService {
 
         if (productsExistAndAvailable || notUpdatingQuantity) {
             Long orderId = Long.valueOf(orderIdString);
-            order.setOrderId(orderId);
-
             Order oldOrder = new Order();
             oldOrder.setOrderedProducts(new ArrayList<>(orderRepository.getEntityById(orderId).getOrderedProducts()));
+
+            order.setOrderId(orderId);
             setDeliveryStrategy(order);
-            orderRepository.updateEntity(order);
 
             for (Map.Entry<Long, Integer> entry : productIdToNewQuantityMap.entrySet()) {
                 Long productId = entry.getKey();
                 int newOrderedQuantity = entry.getValue();
 
                 Product product = productRepository.getEntityById(productId);
-                int oldOrderedQuantity = oldOrder.getOrderedProducts().stream()
-                        .filter(orderedProduct -> orderedProduct.getProduct().getProductId().equals(productId))
-                        .mapToInt(OrderedProduct::getQuantity)
-                        .sum();
+                int oldOrderedQuantity = getOldOrderedQuantity(oldOrder, productId);
+
+                updateRemovedFromOrderProductQuantities(oldOrder, productIdToNewQuantityMap, productId, product);
 
                 int quantityChange = Math.abs(newOrderedQuantity - oldOrderedQuantity);
                 product.setAvailableQuantity(product.getAvailableQuantity() - quantityChange);
@@ -111,6 +109,7 @@ public class OrderService {
                 productRepository.updateEntity(product);
             }
 
+            orderRepository.updateEntity(order);
             entityManager.getTransaction().commit();
             return OrderStatus.UPDATED;
         } else {
@@ -172,10 +171,11 @@ public class OrderService {
                 orderedProducts);
     }
 
-    public Order updateOrder(String jsonData, String orderId) throws ParseException {
+    public Order createUpdateOrder(String jsonData, String orderId) throws ParseException {
         JSONObject jsonObject = new JSONObject(jsonData);
 
         Order order = getOrderById(Long.parseLong(orderId));
+        Order newOrder = new Order();
 
         Date deliveryDate = jsonObject.has("deliveryDate") ? parseDate(jsonObject.getString("deliveryDate")) : order.getDeliveryDate();
         SupplierType supplier = jsonObject.has("supplier") ? SupplierType.valueOf(jsonObject.getString("supplier")) : order.getSupplier();
@@ -196,20 +196,40 @@ public class OrderService {
                 productNames.add(productNamesArray.getString(i));
                 productQuantities.add(Integer.parseInt(productQuantitiesArray.getString(i)));
             }
-            order.setOrderedProducts(createOrderedProductList(productNames, productQuantities));
+            newOrder.setOrderedProducts(createOrderedProductList(productNames, productQuantities));
         }
 
-        order.setDeliveryDate(deliveryDate);
-        order.setSupplier(supplier);
-        order.setCustomerEmail(customerEmail);
-        order.setCustomerAddress(customerAddress);
-        order.setCustomerPhone(customerPhone);
-        order.setAdditionalInformation(additionalInformation);
-        order.setDeliveryStatus(deliveryStatus);
+        newOrder.setDeliveryDate(deliveryDate);
+        newOrder.setSupplier(supplier);
+        newOrder.setCustomerEmail(customerEmail);
+        newOrder.setCustomerAddress(customerAddress);
+        newOrder.setCustomerPhone(customerPhone);
+        newOrder.setAdditionalInformation(additionalInformation);
+        newOrder.setDeliveryStatus(deliveryStatus);
 
-        setDeliveryStrategy(order);
+        setDeliveryStrategy(newOrder);
 
-        return order;
+        return newOrder;
+    }
+
+    private int getOldOrderedQuantity(Order oldOrder, Long productId) {
+        return oldOrder.getOrderedProducts().stream()
+                .filter(orderedProduct -> orderedProduct.getProduct().getProductId().equals(productId))
+                .mapToInt(OrderedProduct::getQuantity)
+                .sum();
+    }
+
+    private void updateRemovedFromOrderProductQuantities(Order oldOrder, Map<Long, Integer> productIdToNewQuantityMap,
+                                                         Long productId, Product product) {
+        if (oldOrder.getOrderedProducts().size() != productIdToNewQuantityMap.size()) {
+            oldOrder.getOrderedProducts().stream()
+                    .filter(orderedProduct -> !orderedProduct.getProduct().getProductId().equals(productId))
+                    .forEach(orderedProduct -> {
+                        orderedProduct.getProduct().setAvailableQuantity(orderedProduct.getProduct()
+                                .getAvailableQuantity() + orderedProduct.getQuantity());
+                        productRepository.updateEntity(product);
+                    });
+        }
     }
 
     private List<OrderedProduct> createOrderedProductList(List<String> productNames, List<Integer> productQuantities) {
