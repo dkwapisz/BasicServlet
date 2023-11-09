@@ -1,26 +1,20 @@
 package com.pk.lab1.servlet;
 
 import com.pk.lab1.databaseUtils.EntityManagerSingleton;
+import com.pk.lab1.enums.DeliveryStatus;
 import com.pk.lab1.enums.OrderStatus;
 import com.pk.lab1.model.Order;
-import com.pk.lab1.model.OrderedProduct;
 import com.pk.lab1.service.OrderService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.pk.lab1.utils.Utils.getJsonData;
-import static com.pk.lab1.utils.Utils.parseDate;
 
 @WebServlet("/order")
 public class OrderServlet extends HttpServlet {
@@ -46,7 +40,7 @@ public class OrderServlet extends HttpServlet {
         try {
             String jsonData = getJsonData(request);
 
-            Order order = createOrderObject(jsonData);
+            Order order = orderService.createOrderObject(jsonData);
 
             OrderStatus orderStatus = orderService.addOrder(order);
 
@@ -70,9 +64,10 @@ public class OrderServlet extends HttpServlet {
             String orderId = request.getParameter(ORDER_ID);
             String jsonData = getJsonData(request);
 
-            Order order = createOrderObject(jsonData);
+            Order order = orderService.updateOrder(jsonData, orderId);
 
             OrderStatus orderStatus = orderService.updateOrder(order, orderId);
+            performDeliveryIfDone(order);
 
             if (orderStatus.equals(OrderStatus.UPDATED)) {
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -106,30 +101,9 @@ public class OrderServlet extends HttpServlet {
         }
     }
 
-    private Order createOrderObject(String jsonData) throws ParseException {
-        JSONObject jsonObject = new JSONObject(jsonData);
-
-        Date deliveryDate = parseDate(jsonObject.getString("deliveryDate"));
-        String supplier = jsonObject.getString("supplier");
-        String customerEmail = jsonObject.getString("customerEmail");
-        String customerAddress = jsonObject.getString("customerAddress");
-        String customerPhone = jsonObject.getString("customerPhone");
-        String additionalInformation = jsonObject.getString("additionalInformation");
-
-        JSONArray productNamesArray = jsonObject.getJSONArray("productNames");
-        JSONArray productQuantitiesArray = jsonObject.getJSONArray("productQuantities");
-
-        List<String> productNames = new ArrayList<>();
-        List<Integer> productQuantities = new ArrayList<>();
-
-        for (int i = 0; i < productNamesArray.length(); i++) {
-            productNames.add(productNamesArray.getString(i));
-            productQuantities.add(Integer.parseInt(productQuantitiesArray.getString(i)));
+    private void performDeliveryIfDone(Order order) {
+        if (order.getDeliveryStatus().equals(DeliveryStatus.ORDER_DELIVERED)) {
+            order.getDeliveryStrategy().deliver(order);
         }
-
-        List<OrderedProduct> orderedProducts = orderService.createOrderedProductList(productNames, productQuantities);
-
-        return new Order(deliveryDate, supplier, customerEmail, customerAddress, customerPhone, additionalInformation,
-                orderedProducts);
     }
 }

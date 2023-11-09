@@ -5,6 +5,7 @@ import com.pk.lab1.model.Product;
 import com.pk.lab1.repository.OrderedProductRepository;
 import com.pk.lab1.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -105,5 +106,27 @@ public class ProductService {
 
     public boolean isProductExistOnOrderList(Long productId) {
         return orderedProductRepository.doesProductExistInOrderList(productId);
+    }
+
+    public Product createProductObject(String jsonData) {
+        JSONObject jsonObject = new JSONObject(jsonData);
+
+        String productName = jsonObject.getString("productName");
+        int productPrice = Integer.parseInt(jsonObject.getString("productPrice"));
+        int availableQuantity = Integer.parseInt(jsonObject.getString("availableQuantity"));
+
+        return new Product(productName, productPrice, availableQuantity);
+    }
+
+    public Product updateProductObject(String jsonData, String productId) {
+        JSONObject jsonObject = new JSONObject(jsonData);
+
+        Product oldProduct = getProductById(Long.parseLong(productId));
+
+        String productName = jsonObject.has("productName") ? jsonObject.getString("productName") : oldProduct.getName();
+        int productPrice = jsonObject.has("productPrice") ? Integer.parseInt(jsonObject.getString("productPrice")) : oldProduct.getProductPrice();
+        int availableQuantity = jsonObject.has("availableQuantity") ? Integer.parseInt(jsonObject.getString("availableQuantity")) : oldProduct.getAvailableQuantity();
+
+        return new Product(productName, productPrice, availableQuantity);
     }
 }

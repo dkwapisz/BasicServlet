@@ -1,5 +1,6 @@
 //package com.pk.lab1.filter;
 //
+//import com.pk.lab1.enums.SupplierType;
 //import jakarta.servlet.FilterChain;
 //import jakarta.servlet.ServletException;
 //import jakarta.servlet.annotation.WebFilter;
@@ -48,7 +49,7 @@
 //            JSONObject jsonObject = new JSONObject(jsonData);
 //
 //            Date deliveryDate = parseDate(jsonObject.getString("deliveryDate"));
-//            String supplier = jsonObject.getString("supplier");
+//            SupplierType supplier = SupplierType.valueOf(jsonObject.getString("supplier"));
 //            String customerEmail = jsonObject.getString("customerEmail");
 //            String customerAddress = jsonObject.getString("customerAddress");
 //            String customerPhone = jsonObject.getString("customerPhone");

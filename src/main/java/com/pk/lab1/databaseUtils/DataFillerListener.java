@@ -1,5 +1,6 @@
 package com.pk.lab1.databaseUtils;
 
+import com.pk.lab1.enums.SupplierType;
 import com.pk.lab1.model.Order;
 import com.pk.lab1.model.OrderedProduct;
 import com.pk.lab1.model.Product;
@@ -40,7 +41,7 @@ public class DataFillerListener implements ServletContextListener {
         orderedProducts.add(orderedProduct2);
         orderedProducts.add(orderedProduct3);
 
-        Order order = new Order(new Date(), "Supplier 1", "customer@example.com",
+        Order order = new Order(new Date(), SupplierType.UPS, "customer@example.com",
                 "Address 123", "123-456-7890", "Additional Info", orderedProducts);
 
         orderService.addOrder(order);

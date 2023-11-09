@@ -1,6 +1,7 @@
 <%@ page import="com.pk.lab1.model.Order" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.pk.lab1.model.OrderedProduct" %>
+<%@ page import="com.pk.lab1.enums.SupplierType" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
@@ -24,7 +25,13 @@
     <input type="date" id="deliveryDate" name="deliveryDate" required><br><br>
 
     <label for="supplier">Supplier:</label>
-    <input type="text" id="supplier" name="supplier" required><br><br>
+    <select id="supplier" name="supplier" required>
+        <option value="<%= SupplierType.POLISH_POST %>"><%= SupplierType.POLISH_POST %></option>
+        <option value="<%= SupplierType.UPS %>"><%= SupplierType.UPS %></option>
+        <option value="<%= SupplierType.DHL %>"><%= SupplierType.DHL %></option>
+        <option value="<%= SupplierType.DPD %>"><%= SupplierType.DPD %></option>
+        <option value="<%= SupplierType.INPOST %>"><%= SupplierType.INPOST %></option>
+    </select><br><br>
 
     <label for="customerEmail">Customer Email:</label>
     <input type="email" id="customerEmail" name="customerEmail" required><br><br>
@@ -64,6 +71,7 @@
         <th>Order Date</th>
         <th>Delivery Date</th>
         <th>Supplier</th>
+        <th>Delivery Status</th>
         <th>Customer Email</th>
         <th>Customer Address</th>
         <th>Customer Phone</th>
@@ -82,6 +90,7 @@
         <td><%= order.getOrderDate() %></td>
         <td><%= order.getDeliveryDate() %></td>
         <td><%= order.getSupplier() %></td>
+        <td><%= order.getDeliveryStatus() %></td>
         <td><%= order.getCustomerEmail() %></td>
         <td><%= order.getCustomerAddress() %></td>
         <td><%= order.getCustomerPhone() %></td>
@@ -116,6 +125,8 @@
             <button type="button" onclick="modifyOrder(<%= order.getOrderId() %>)">Modify</button>
             <h1></h1>
             <button type="button" onclick="deleteOrder(<%= order.getOrderId() %>)">Delete</button>
+            <h1></h1>
+            <button type="button" onclick="changeDeliveryStatus(<%= order.getOrderId() %>)">Change Status</button>
         </td>
     </tr>
     <%
@@ -156,7 +167,8 @@
             customerPhone: customerPhone,
             additionalInformation: additionalInformation,
             productNames: productNames,
-            productQuantities: productQuantities
+            productQuantities: productQuantities,
+            deliveryStatus: "ORDER_CREATED"
         };
 
         if (hasDuplicates(productNames)) {
@@ -276,6 +288,41 @@
             });
 
         clearForm();
+    }
+
+    function changeDeliveryStatus(orderId) {
+        const deliveryOptions = ["ORDER_CREATED", "ORDER_READY_TO_SEND", "ORDER_SENT", "ORDER_DELIVERED"];
+        const selectedNewDelivery = prompt("Wybierz nowy status dostawy:\n0 - ORDER_CREATED\n1 - ORDER_READY_TO_SEND\n2 - ORDER_SENT\n3 - ORDER_DELIVERED");
+
+        if (selectedNewDelivery !== null && selectedNewDelivery >= 0 && selectedNewDelivery < deliveryOptions.length) {
+            const endpointUrl = "order/status?orderId=" + orderId;
+
+            fetch(endpointUrl, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ deliveryStatus: deliveryOptions[selectedNewDelivery] })
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        alert("Delivery status has been updated.");
+                        productCounter = 1;
+                        location.reload();
+                    } else if (response.status === 400) {
+                        alert("Incorrect input data.");
+                    } else if (response.status === 406) {
+                        alert("Selected products are not available. Cannot update.");
+                    } else {
+                        console.error("Cannot update delivery status. Status: " + response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error occurred when making a PUT request: ", error);
+                });
+        } else {
+            alert("You chose wrong delivery option. Try again.");
+        }
     }
 
     function addProductRow() {

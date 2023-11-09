@@ -40,7 +40,7 @@ public class ProductServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             String jsonData = getJsonData(request);
-            Product product = createProductObject(jsonData);
+            Product product = productService.createProductObject(jsonData);
 
             ProductStatus productStatus = productService.addProduct(product);
 
@@ -63,7 +63,7 @@ public class ProductServlet extends HttpServlet {
             String productId = request.getParameter(PRODUCT_ID);
             String jsonData = getJsonData(request);
 
-            Product product = createProductObject(jsonData);
+            Product product = productService.updateProductObject(jsonData, productId);
 
             ProductStatus productStatus = productService.updateProduct(product, productId);
 
@@ -102,15 +102,5 @@ public class ProductServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Cannot remove product:  " + e.getMessage());
         }
-    }
-
-    private Product createProductObject(String jsonData) {
-        JSONObject jsonObject = new JSONObject(jsonData);
-
-        String productName = jsonObject.getString("productName");
-        int productPrice = Integer.parseInt(jsonObject.getString("productPrice"));
-        int availableQuantity = Integer.parseInt(jsonObject.getString("availableQuantity"));
-
-        return new Product(productName, productPrice, availableQuantity);
     }
 }
