@@ -85,7 +85,7 @@ public class OrderValidationFilter extends HttpFilter {
                 return true;
             }
         } catch (Exception e) {
-            System.err.println("Error occured: " + e.getMessage());
+            System.err.println("Error occurred: " + e.getMessage());
             return false;
         }
 
@@ -123,7 +123,7 @@ public class OrderValidationFilter extends HttpFilter {
                 return true;
             }
         } catch (Exception e) {
-            System.err.println("Error occured: " + e.getMessage());
+            System.err.println("Error occurred: " + e.getMessage());
             return false;
         }
 
