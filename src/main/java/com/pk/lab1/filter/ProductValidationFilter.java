@@ -1,5 +1,6 @@
 package com.pk.lab1.filter;
 
+import com.pk.lab1.enums.SupplierType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static com.pk.lab1.utils.Utils.getJsonData;
 import static java.util.Objects.nonNull;
@@ -49,12 +51,11 @@ public class ProductValidationFilter extends HttpFilter {
             JSONObject jsonObject = new JSONObject(jsonData);
 
             String productName = jsonObject.getString("productName");
-            String productPrice = jsonObject.getString("productPrice");
-            String availableQuantity = jsonObject.getString("availableQuantity");
+            Integer productPrice = jsonObject.has("productPrice") ? Integer.parseInt(jsonObject.getString("productPrice")) : null;
+            Integer availableQuantity = jsonObject.has("availableQuantity") ? Integer.parseInt(jsonObject.getString("availableQuantity")) : null;
 
-            if (nonNull(productName) && nonNull(productPrice) && nonNull(availableQuantity)
-                    && !productName.isEmpty() && !productPrice.isEmpty() && !availableQuantity.isEmpty()
-                    && Integer.parseInt(productPrice) > 0 && Integer.parseInt(availableQuantity) >= 0) {
+            if (isValidProductName(productName) && isValidProductPrice(productPrice) &&
+                    isValidAvailableQuantity(availableQuantity)) {
                 return true;
             }
         } catch (Exception e) {
@@ -73,8 +74,8 @@ public class ProductValidationFilter extends HttpFilter {
             Integer productPrice = jsonObject.has("productPrice") ? Integer.parseInt(jsonObject.getString("productPrice")) : null;
             Integer availableQuantity = jsonObject.has("availableQuantity") ? Integer.parseInt(jsonObject.getString("availableQuantity")) : null;
 
-            if ((nonNull(productName) && !productName.isEmpty()) || (nonNull(productPrice) && productPrice > 0)
-                    || (nonNull(availableQuantity) && availableQuantity >= 0)) {
+            if (isValidProductName(productName) || isValidProductPrice(productPrice) ||
+                    isValidAvailableQuantity(availableQuantity)) {
                 return true;
             }
         } catch (Exception e) {
@@ -83,5 +84,17 @@ public class ProductValidationFilter extends HttpFilter {
         }
 
         return false;
+    }
+
+    private boolean isValidProductName(String productName) {
+        return nonNull(productName) && !productName.isEmpty();
+    }
+
+    private boolean isValidProductPrice(Integer productPrice) {
+        return nonNull(productPrice) && productPrice > 0;
+    }
+
+    private boolean isValidAvailableQuantity(Integer availableQuantity) {
+        return nonNull(availableQuantity) && availableQuantity >= 0;
     }
 }
