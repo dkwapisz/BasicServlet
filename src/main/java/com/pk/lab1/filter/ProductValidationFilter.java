@@ -1,6 +1,5 @@
 package com.pk.lab1.filter;
 
-import com.pk.lab1.enums.SupplierType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -10,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Date;
 
 import static com.pk.lab1.utils.Utils.getJsonData;
 import static java.util.Objects.nonNull;
