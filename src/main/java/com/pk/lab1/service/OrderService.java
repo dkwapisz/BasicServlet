@@ -23,6 +23,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class OrderService {
+
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final EntityManager entityManager;
@@ -199,6 +200,7 @@ public class OrderService {
             newOrder.setOrderedProducts(order.getOrderedProducts());
         }
 
+        newOrder.setOrderDate(order.getOrderDate());
         newOrder.setDeliveryDate(deliveryDate);
         newOrder.setSupplier(supplier);
         newOrder.setCustomerEmail(customerEmail);
@@ -224,14 +226,12 @@ public class OrderService {
     }
 
     private void updateRemovedFromOrderProductQuantities(Order oldOrder, Map<Long, Integer> productIdToNewQuantityMap) {
-        if (oldOrder.getOrderedProducts().size() != productIdToNewQuantityMap.size()) {
-            oldOrder.getOrderedProducts().stream()
-                    .filter(orderedProduct -> !productIdToNewQuantityMap.containsKey(orderedProduct.getProduct().getProductId()))
-                    .forEach(orderedProduct -> {
-                        orderedProduct.getProduct().setAvailableQuantity(orderedProduct.getProduct()
-                                .getAvailableQuantity() + orderedProduct.getQuantity());
-                    });
-        }
+        oldOrder.getOrderedProducts().stream()
+                .filter(orderedProduct -> !productIdToNewQuantityMap.containsKey(orderedProduct.getProduct().getProductId()))
+                .forEach(orderedProduct -> {
+                    orderedProduct.getProduct().setAvailableQuantity(orderedProduct.getProduct()
+                            .getAvailableQuantity() + orderedProduct.getQuantity());
+                });
     }
 
     private List<OrderedProduct> createOrderedProductList(List<String> productNames, List<Integer> productQuantities) {

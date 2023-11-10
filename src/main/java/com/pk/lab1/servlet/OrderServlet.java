@@ -102,7 +102,7 @@ public class OrderServlet extends HttpServlet {
     }
 
     private void performDeliveryIfDone(Order order) {
-        if (order.getDeliveryStatus().equals(DeliveryStatus.ORDER_DELIVERED)) {
+        if (order.getDeliveryStatus().equals(DeliveryStatus.ORDER_SENT)) {
             order.getDeliveryStrategy().deliver(order);
         }
     }

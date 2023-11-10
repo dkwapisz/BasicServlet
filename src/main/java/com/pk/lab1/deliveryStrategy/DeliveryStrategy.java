@@ -4,4 +4,6 @@ import com.pk.lab1.model.Order;
 
 public interface DeliveryStrategy {
     void deliver(Order order);
+
+    String generateRandomTrackingID();
 }
